@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="si">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Register - SriLanka Market</title>
+<meta name="description" content="Work, food, trips and help for Sri Lankans in Israel, in Sinhala, Tamil, English and Hebrew. Free registration on WhatsApp.">
+<meta name="robots" content="index,follow">
+<meta property="og:title" content="Register - SriLanka Market">
+<meta property="og:description" content="Legal construction work, Sri Lankan food, day-off trips and help in your language. We never take money from workers.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;600;800&family=Noto+Sans+Tamil:wght@400;600;800&family=Heebo:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" data-internal="index.html" href="index.html"><i></i><span data-i18n="brand"></span></a>
+  <div class="lang" role="group" aria-label="Language"><button type="button" data-lang="si">සිං</button><button type="button" data-lang="ta">தமிழ்</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="he">עב</button></div>
+</div></header>
+<nav class="menu"><div class="wrap"><a data-internal="index.html" href="index.html" data-i18n="nav_home"></a><a data-internal="work.html" href="work.html" data-i18n="nav_work"></a><a data-internal="shop.html" href="shop.html" data-i18n="nav_shop"></a><a data-internal="trips.html" href="trips.html" data-i18n="nav_trips"></a><a data-internal="services.html" href="services.html" data-i18n="nav_services"></a><a data-internal="about.html" href="about.html" data-i18n="nav_about"></a><a data-internal="register.html" href="register.html" data-i18n="nav_register" aria-current="page"></a></div></nav>
+<main><div class="wrap">
+    <h1 data-i18n="r_title"></h1><p class="lead" data-i18n="r_lead"></p>
+    <form id="reg" class="card" autocomplete="on">
+      <label><span data-i18n="r_name"></span><input id="r-name" required maxlength="120" autocomplete="name"></label>
+      <label><span data-i18n="r_phone"></span><input id="r-phone" type="tel" inputmode="tel" maxlength="20" placeholder="05x-xxxxxxx" autocomplete="tel"></label>
+      <div class="row"><label><span data-i18n="r_trade"></span><select id="r-trade"></select></label><label><span data-i18n="r_permit"></span><select id="r-permit"></select></label></div>
+      <div class="row"><label><span data-i18n="r_corp"></span><input id="r-corp" maxlength="120"></label><label><span data-i18n="r_arrived"></span><input id="r-arrived" type="month"></label></div>
+      <label><span data-i18n="r_region"></span><select id="r-region"></select></label>
+      <div><div style="font-size:14px;color:var(--muted);margin-bottom:4px" data-i18n="r_interests"></div><div class="checks" id="r-interests"></div></div>
+      <label><span data-i18n="r_note"></span><textarea id="r-note" rows="2" maxlength="400"></textarea></label>
+      <label class="consent"><input id="r-consent" type="checkbox"><span data-i18n="r_consent"></span></label>
+      <div class="err" id="r-err" aria-live="polite"></div>
+      <button class="cta" type="submit" data-i18n="r_btn"></button>
+    </form>
+    <div class="num" data-num></div>
+</div></main>
+<footer><div class="wrap"><div data-i18n="foot1"></div><div data-i18n="foot2"></div><div><a data-internal="privacy.html" href="privacy.html" data-i18n="foot_privacy"></a> &middot; <a data-wa href="#" target="_blank" rel="noopener">WhatsApp</a></div></div></footer>
+<script src="assets/site.js"></script>
+</body>
+</html>
