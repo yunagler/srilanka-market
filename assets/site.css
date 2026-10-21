@@ -56,3 +56,6 @@ input, select, textarea { font: inherit; font-size: 16px; padding: 10px 12px; bo
 footer { border-top: 1px solid var(--line); margin-top: 20px } footer .wrap { padding-block: 16px 28px; font-size: 13px; color: var(--muted); display: grid; gap: 6px }
 footer a { color: var(--muted) }
 @media (prefers-reduced-motion: no-preference) { .cta { transition: transform .08s } .cta:active { transform: scale(.985) } }
+
+.prod{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.prod .card p{margin:4px 0 0;font-weight:700}

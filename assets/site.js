@@ -3,6 +3,7 @@
   "use strict";
   var DEFAULT_TO = "972544567610"; // registration WhatsApp; overridden by ?to=<digits>
   var SURVEY_API = "https://app.ymarket.co.il/api/public/community-survey"; // CRM endpoint that stores survey answers
+  var SHOP_API = "https://app.ymarket.co.il/api/public/shop/srilanka-market/catalog"; // live points + products (CRM)
   var PRODUCTS = ["rice_samba","rice_nadu","rice_basmati","dhal_red","flour_atta","flour_white","sugar","coconut_milk","oil_coconut","oil_cooking","curry_powder","chili","turmeric","spices_whole","maldive_fish","tea_ceylon","noodles","sardines","tuna","milk_powder","biscuits","jaggery","papadam","toilet_paper","paper_towel","dish_soap","laundry","trash_bags","disposables","food_boxes","soap"];
   var DAYS = ["sat","sun","fri","other","none"], SPENDS = ["lt300","300_600","600_1000","gt1000"], PAYS = ["cash","card","link","any"];
   var T = {
@@ -47,6 +48,7 @@
       pr_coconut_milk: "Coconut milk", pr_oil_coconut: "Coconut oil", pr_oil_cooking: "Cooking oil", pr_curry_powder: "Curry powder (roasted)", pr_chili: "Chili powder / flakes", pr_turmeric: "Turmeric", pr_spices_whole: "Whole spices (cardamom, cinnamon, cloves)",
       pr_maldive_fish: "Maldive fish", pr_tea_ceylon: "Ceylon tea", pr_noodles: "Instant noodles", pr_sardines: "Canned sardines / mackerel", pr_tuna: "Canned tuna", pr_milk_powder: "Milk powder", pr_biscuits: "Biscuits / snacks", pr_jaggery: "Jaggery", pr_papadam: "Papadam",
       pr_toilet_paper: "Toilet paper", pr_paper_towel: "Paper towels", pr_dish_soap: "Dish soap", pr_laundry: "Laundry powder", pr_trash_bags: "Trash bags", pr_disposables: "Plates, cups, cutlery", pr_food_boxes: "Food boxes", pr_soap: "Soap / shampoo",
+      s_points_t: "Pickup points", s_items_t: "Some of our products", s_order: "Order now", s_next: "Next pickup: ", s_survey_cta: "Tell us what to bring (2 min)",
       r_title: "Register", r_lead: "Fill in the form. The green button opens WhatsApp with your message ready. Send it, and we call you back within a few days in your language.",
       r_name: "Full name", r_phone: "Phone (Israel)", r_trade: "Trade", r_permit: "Permit type", r_corp: "Current corporation (company name)", r_arrived: "Arrived in Israel", r_region: "Where you want to work", r_interests: "I am interested in", r_note: "Anything else",
       r_consent: "I agree that you contact me about work and services. My details are kept for that only and deleted on request.", r_btn: "Send on WhatsApp", r_err_name: "Please write your full name.", r_err_consent: "Please tick the consent box.",
@@ -95,6 +97,7 @@
       pr_coconut_milk: "පොල් කිරි", pr_oil_coconut: "පොල් තෙල්", pr_oil_cooking: "ඉවුම් තෙල්", pr_curry_powder: "තුනපහ (බැදපු)", pr_chili: "මිරිස් කුඩු / පියලි", pr_turmeric: "කහ", pr_spices_whole: "මුළු කුළුබඩු (එනසාල්, කුරුඳු, කරාබුනැටි)",
       pr_maldive_fish: "උම්බලකඩ", pr_tea_ceylon: "ලංකා තේ", pr_noodles: "ක්ෂණික නූඩ්ල්ස්", pr_sardines: "ටින් සාඩින් / මැකරල්", pr_tuna: "ටින් ටූනා", pr_milk_powder: "කිරි පිටි", pr_biscuits: "බිස්කට් / කෑම", pr_jaggery: "හකුරු", pr_papadam: "පපඩම්",
       pr_toilet_paper: "ටොයිලට් පේපර්", pr_paper_towel: "කඩදාසි තුවා", pr_dish_soap: "පිඟන් සෝදන දියර", pr_laundry: "රෙදි සෝදන කුඩු", pr_trash_bags: "කුණු බෑග්", pr_disposables: "පිඟන්, කෝප්ප, හැඳි", pr_food_boxes: "කෑම පෙට්ටි", pr_soap: "සබන් / ෂැම්පු",
+      s_points_t: "ලබා ගන්නා ස්ථාන", s_items_t: "අපේ බඩු කිහිපයක්", s_order: "දැන් ඇණවුම් කරන්න", s_next: "ඊළඟ ලබා ගැනීම: ", s_survey_cta: "අපි මොනවද ගේන්න ඕනේ කියන්න (මිනිත්තු 2)",
       r_title: "ලියාපදිංචි වන්න", r_lead: "ෆෝම් එක පුරවන්න. කොළ බොත්තම ඔබේ message එක සූදානම්ව WhatsApp විවෘත කරනවා. යවන්න — දවස් කිහිපයක් ඇතුළත අපි ඔබේ භාෂාවෙන් ආපසු කතා කරනවා.",
       r_name: "සම්පූර්ණ නම", r_phone: "දුරකථන (ඊශ්‍රායල)", r_trade: "රැකියාව", r_permit: "බලපත්‍ර වර්ගය", r_corp: "දැන් ඉන්න සමාගම (නම)", r_arrived: "ඊශ්‍රායලයට ආවේ", r_region: "වැඩ කරන්න කැමති තැන", r_interests: "මම කැමතියි", r_note: "වෙනත් දෙයක්",
       r_consent: "රැකියා සහ සේවා ගැන මාව සම්බන්ධ කර ගන්න මම එකඟයි. මගේ විස්තර ඒ සඳහා පමණයි තබාගන්නේ, ඉල්ලූ විට මකනවා.", r_btn: "WhatsApp හරහා යවන්න", r_err_name: "කරුණාකර ඔබේ සම්පූර්ණ නම ලියන්න.", r_err_consent: "කරුණාකර එකඟතා කොටුව ලකුණු කරන්න.",
@@ -143,6 +146,7 @@
       pr_coconut_milk: "தேங்காய்ப் பால்", pr_oil_coconut: "தேங்காய் எண்ணெய்", pr_oil_cooking: "சமையல் எண்ணெய்", pr_curry_powder: "கறித்தூள் (வறுத்தது)", pr_chili: "மிளகாய்த் தூள் / செதில்", pr_turmeric: "மஞ்சள்", pr_spices_whole: "முழு மசாலா (ஏலக்காய், கறுவா, கிராம்பு)",
       pr_maldive_fish: "மாசிக்கருவாடு (Maldive fish)", pr_tea_ceylon: "இலங்கைத் தேயிலை", pr_noodles: "உடனடி நூடுல்ஸ்", pr_sardines: "டின் சார்டின் / மக்கரல்", pr_tuna: "டின் டூனா", pr_milk_powder: "பால் பவுடர்", pr_biscuits: "பிஸ்கட் / சிற்றுண்டி", pr_jaggery: "வெல்லம்", pr_papadam: "பப்படம்",
       pr_toilet_paper: "டாய்லெட் பேப்பர்", pr_paper_towel: "பேப்பர் டவல்", pr_dish_soap: "பாத்திரம் கழுவும் திரவம்", pr_laundry: "சலவைத் தூள்", pr_trash_bags: "குப்பைப் பைகள்", pr_disposables: "தட்டுகள், கோப்பைகள், கரண்டிகள்", pr_food_boxes: "உணவுப் பெட்டிகள்", pr_soap: "சோப்பு / ஷாம்பு",
+      s_points_t: "பெறும் இடங்கள்", s_items_t: "எங்கள் சில பொருட்கள்", s_order: "இப்போது ஆர்டர் செய்", s_next: "அடுத்த பெறுதல்: ", s_survey_cta: "என்ன கொண்டு வர வேண்டும் என்று சொல்லுங்கள் (2 நிமி)",
       r_title: "பதிவு செய்", r_lead: "படிவத்தை நிரப்புங்கள். பச்சை பொத்தான் உங்கள் செய்தி தயாராக WhatsApp-ஐத் திறக்கும். அனுப்புங்கள்; சில நாட்களுக்குள் உங்கள் மொழியில் திரும்ப அழைப்போம்.",
       r_name: "முழுப் பெயர்", r_phone: "தொலைபேசி (இஸ்ரேல்)", r_trade: "தொழில்", r_permit: "அனுமதி வகை", r_corp: "தற்போதைய நிறுவனம் (பெயர்)", r_arrived: "இஸ்ரேலுக்கு வந்தது", r_region: "வேலை செய்ய விரும்பும் இடம்", r_interests: "எனக்கு ஆர்வம்", r_note: "வேறு ஏதேனும்",
       r_consent: "வேலை மற்றும் சேவைகள் குறித்து என்னைத் தொடர்பு கொள்ள ஒப்புக்கொள்கிறேன். என் விவரங்கள் அதற்காக மட்டுமே; கேட்டால் நீக்கப்படும்.", r_btn: "WhatsApp-இல் அனுப்பு", r_err_name: "உங்கள் முழுப் பெயரை எழுதுங்கள்.", r_err_consent: "ஒப்புதல் பெட்டியைத் தேர்வு செய்யுங்கள்.",
@@ -191,6 +195,7 @@
       pr_coconut_milk: "חלב קוקוס", pr_oil_coconut: "שמן קוקוס", pr_oil_cooking: "שמן בישול", pr_curry_powder: "אבקת קארי (קלויה)", pr_chili: "צ'ילי טחון / פתיתים", pr_turmeric: "כורכום", pr_spices_whole: "תבלינים שלמים (הל, קינמון, ציפורן)",
       pr_maldive_fish: "Maldive fish (דג מיובש)", pr_tea_ceylon: "תה ציילון", pr_noodles: "נודלס מהיר", pr_sardines: "סרדינים / מקרל בקופסה", pr_tuna: "טונה בקופסה", pr_milk_powder: "אבקת חלב", pr_biscuits: "ביסקוויטים / חטיפים", pr_jaggery: "ג'אגרי", pr_papadam: "פפדם",
       pr_toilet_paper: "נייר טואלט", pr_paper_towel: "מגבות נייר", pr_dish_soap: "סבון כלים", pr_laundry: "אבקת כביסה", pr_trash_bags: "שקיות אשפה", pr_disposables: "צלחות, כוסות, סכו\"ם", pr_food_boxes: "קופסאות אוכל", pr_soap: "סבון / שמפו",
+      s_points_t: "נקודות איסוף", s_items_t: "חלק מהמוצרים שלנו", s_order: "להזמנה עכשיו", s_next: "האיסוף הבא: ", s_survey_cta: "ספרו לנו מה להביא (2 דקות)",
       r_title: "הרשמה", r_lead: "ממלאים את הטופס. הכפתור הירוק פותח וואטסאפ עם ההודעה מוכנה. שולחים, ואנחנו חוזרים תוך כמה ימים בשפה שלך.",
       r_name: "שם מלא", r_phone: "טלפון (ישראל)", r_trade: "מקצוע", r_permit: "סוג היתר", r_corp: "התאגיד הנוכחי (שם החברה)", r_arrived: "הגעתי לישראל", r_region: "איפה אני רוצה לעבוד", r_interests: "מתעניין ב", r_note: "עוד משהו",
       r_consent: "אני מסכים שתיצרו איתי קשר בעניין עבודה ושירותים. הפרטים נשמרים רק לזה ונמחקים לפי בקשה.", r_btn: "שליחה בוואטסאפ", r_err_name: "נא לכתוב שם מלא.", r_err_consent: "נא לסמן את תיבת ההסכמה.",
@@ -288,5 +293,33 @@
         .then(function () { busy = false; btn.disabled = false; btn.textContent = t("sv_btn"); });
     });
   }
+  // live shop showcase (shop.html): points + products from the CRM; hidden until the shop is open
+  function loadShowcase() {
+    var box = $("live"); if (!box) return;
+    fetch(SHOP_API + "?lang=" + lang).then(function (r) { if (!r.ok) throw new Error(); return r.json(); }).then(function (d) {
+      if (!d || !d.shop || !d.shop.active || !d.points || !d.points.length) { box.hidden = true; return; }
+      var pts = $("live-points"); pts.textContent = "";
+      d.points.forEach(function (p) {
+        var c = document.createElement("div"); c.className = "card";
+        var b = document.createElement("b"); b.textContent = p.name + (p.area ? " · " + p.area : ""); c.appendChild(b);
+        if (p.address) { var a = document.createElement("p"); a.textContent = p.address; c.appendChild(a); }
+        if (p.nextDrop) { var n = document.createElement("p"); n.textContent = t("s_next") + new Date(p.nextDrop).toLocaleDateString(lang === "he" ? "he-IL" : "en-GB", { weekday: "long", day: "2-digit", month: "2-digit", timeZone: "Asia/Jerusalem" }); c.appendChild(n); }
+        var o = document.createElement("a"); o.className = "more"; o.href = p.orderUrl; o.textContent = t("s_order"); c.appendChild(o);
+        pts.appendChild(c);
+      });
+      var it = $("live-items"); it.textContent = "";
+      (d.items || []).slice(0, 12).forEach(function (i) {
+        var c = document.createElement("div"); c.className = "card";
+        if (i.imageUrl) { var im = document.createElement("img"); im.src = i.imageUrl; im.alt = ""; im.loading = "lazy"; im.style.cssText = "width:100%;aspect-ratio:1;object-fit:contain"; c.appendChild(im); }
+        var nm = document.createElement("b"); nm.textContent = i.name; c.appendChild(nm);
+        var pr = document.createElement("p"); pr.textContent = i.priceNis.toFixed(2) + " ₪"; c.appendChild(pr);
+        it.appendChild(c);
+      });
+      $("live-order").href = d.orderUrl;
+      box.hidden = false; var soon = $("live-soon"); if (soon) soon.hidden = true;
+    }).catch(function () { box.hidden = true; });
+  }
   apply();
+  loadShowcase();
+  document.querySelectorAll(".lang button").forEach(function (b) { b.addEventListener("click", loadShowcase); });
 })();
