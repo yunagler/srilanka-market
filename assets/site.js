@@ -2,6 +2,9 @@
 (function () {
   "use strict";
   var DEFAULT_TO = "972544567610"; // registration WhatsApp; overridden by ?to=<digits>
+  var SURVEY_API = "https://app.ymarket.co.il/api/public/community-survey"; // CRM endpoint that stores survey answers
+  var PRODUCTS = ["rice_samba","rice_nadu","rice_basmati","dhal_red","flour_atta","flour_white","sugar","coconut_milk","oil_coconut","oil_cooking","curry_powder","chili","turmeric","spices_whole","maldive_fish","tea_ceylon","noodles","sardines","tuna","milk_powder","biscuits","jaggery","papadam","toilet_paper","paper_towel","dish_soap","laundry","trash_bags","disposables","food_boxes","soap"];
+  var DAYS = ["sat","sun","fri","other","none"], SPENDS = ["lt300","300_600","600_1000","gt1000"], PAYS = ["cash","card","link","any"];
   var T = {
     en: {
       brand: "SriLanka Market", nav_home: "Home", nav_work: "Work", nav_shop: "Shop", nav_trips: "Trips", nav_services: "Help", nav_about: "About", nav_register: "Register",
@@ -30,6 +33,20 @@
       a_title: "About us", a_p1: "We are an Israeli family business from the centre of Israel: a wholesale distributor of cleaning, paper and food products to businesses, and a building business registering as a contractor.", a_p2: "The idea for this service came from a Sri Lankan worker on one of our sites, who saw that his friends needed work they can trust, food from home, and someone who answers. We are building it with him.", a_p3: "We work only with licensed corporations and registered professionals. We publish no names of workers or partners.",
       a_priv_t: "Privacy", a_priv: "We keep only what you send us on WhatsApp: name, phone, trade, permit type, corporation, arrival month, area, interests. It is used to contact you about work and services. Write 'delete' and we delete it.",
       // register
+      // survey
+      nav_survey: "Survey", sv_title: "2 minutes: what should we bring?", sv_lead: "We are opening weekly pickup points for Sri Lankan food and daily goods. Tell us what you need and where you are. No name needed unless you want us to call you.",
+      sv_city: "Where do you live? (city / area)", sv_day: "Your day off", sv_buy: "Where do you buy Sri Lankan food today? (shop, city, WhatsApp group)", sv_spend: "How much do you spend on food per month (per person)?",
+      sv_products: "Tick what you would buy every week", sv_missing: "What is missing or too expensive in Israel? (write freely)", sv_pay: "How do you prefer to pay?", sv_host: "I could be the contact person for a pickup point where I live (storage for one day a week).",
+      sv_name: "Name (optional)", sv_phone: "Phone (optional, if you want us to call)", sv_note: "Anything else", sv_consent: "If I gave my phone: I agree that you contact me about the shop. My details are kept for that only and deleted on request.",
+      sv_btn: "Send", sv_sending: "Sending…", sv_ok_t: "Thank you! 🙏", sv_ok: "Your answers reached us. We open a pickup point in your area when there are enough people. If you left a phone, we will write to you in your language.",
+      sv_err: "Could not send. Check your connection and try again, or send it on WhatsApp.", sv_err_consent: "You wrote a phone — please tick the consent box, or clear the phone.", sv_wa: "Send on WhatsApp instead",
+      d_sat: "Saturday", d_sun: "Sunday", d_fri: "Friday", d_other: "Another day / changes", d_none: "No fixed day",
+      sp_lt300: "Under 300 ₪", sp_300_600: "300–600 ₪", sp_600_1000: "600–1,000 ₪", sp_gt1000: "Over 1,000 ₪",
+      pay_cash: "Cash at pickup", pay_card: "Card", pay_link: "Payment link in advance", pay_any: "Any",
+      pr_rice_samba: "Samba rice", pr_rice_nadu: "Nadu / red rice", pr_rice_basmati: "Basmati rice", pr_dhal_red: "Red dhal (lentils)", pr_flour_atta: "Atta flour", pr_flour_white: "White flour", pr_sugar: "Sugar",
+      pr_coconut_milk: "Coconut milk", pr_oil_coconut: "Coconut oil", pr_oil_cooking: "Cooking oil", pr_curry_powder: "Curry powder (roasted)", pr_chili: "Chili powder / flakes", pr_turmeric: "Turmeric", pr_spices_whole: "Whole spices (cardamom, cinnamon, cloves)",
+      pr_maldive_fish: "Maldive fish", pr_tea_ceylon: "Ceylon tea", pr_noodles: "Instant noodles", pr_sardines: "Canned sardines / mackerel", pr_tuna: "Canned tuna", pr_milk_powder: "Milk powder", pr_biscuits: "Biscuits / snacks", pr_jaggery: "Jaggery", pr_papadam: "Papadam",
+      pr_toilet_paper: "Toilet paper", pr_paper_towel: "Paper towels", pr_dish_soap: "Dish soap", pr_laundry: "Laundry powder", pr_trash_bags: "Trash bags", pr_disposables: "Plates, cups, cutlery", pr_food_boxes: "Food boxes", pr_soap: "Soap / shampoo",
       r_title: "Register", r_lead: "Fill in the form. The green button opens WhatsApp with your message ready. Send it, and we call you back within a few days in your language.",
       r_name: "Full name", r_phone: "Phone (Israel)", r_trade: "Trade", r_permit: "Permit type", r_corp: "Current corporation (company name)", r_arrived: "Arrived in Israel", r_region: "Where you want to work", r_interests: "I am interested in", r_note: "Anything else",
       r_consent: "I agree that you contact me about work and services. My details are kept for that only and deleted on request.", r_btn: "Send on WhatsApp", r_err_name: "Please write your full name.", r_err_consent: "Please tick the consent box.",
@@ -65,6 +82,19 @@
       v_1t: "ගමන්", v_1p: "එකඟ වූ මිලකට බලපත්‍රලාභී ටැක්සි සහ ප්‍රවාහන රියදුරන් සමඟ ගමන්. මුදලට පෞද්ගලික වාහන කවදාවත් නැහැ — ඊශ්‍රායලයේ ඒක නීති විරෝධීයි සහ ඔබට අනාරක්ෂිතයි.", v_2t: "ෆෝම් සහ ප්‍රශ්න", v_2p: "ලිපියක්, වැටුප් පත්‍රිකාවක්, ෆෝම් එකක් තේරුම් ගන්න උදව්. අපි පැහැදිලි කරනවා; අවශ්‍ය විට නීතිඥයා තීරණය කරනවා.", v_3t: "මුදල් සහ තැපැල්", v_3p: "සැලසුම් කර ඇත, තවම විවෘත නැහැ. ඊශ්‍රායලයේ මේවාට බලපත්‍ර ඕනේ, අපි බලපත්‍ර ඇති දේ පමණයි කරන්නේ.", v_4t: "උත්තර දෙන කෙනෙක්", v_4p: "සිංහලෙන් හෝ දෙමළෙන් WhatsApp. දවසක් ඇතුළත උත්තර දෙනවා.",
       a_title: "අපි ගැන", a_p1: "අපි ඊශ්‍රායලයේ මැද පළාතේ ඊශ්‍රායල පවුල් ව්‍යාපාරයක්: ව්‍යාපාරවලට පිරිසිදු කිරීමේ, කඩදාසි සහ ආහාර නිෂ්පාදන තොග බෙදාහරින්නෙක්, සහ කොන්ත්‍රාත්කරුවෙකු ලෙස ලියාපදිංචි වෙමින් ඉන්න ගොඩනැඟිලි ව්‍යාපාරයක්.", a_p2: "මේ සේවාවේ අදහස ආවේ අපේ site එකක ශ්‍රී ලාංකික කම්කරුවෙකුගෙන් — ඔහුගේ යාළුවන්ට විශ්වාස කරන්න පුළුවන් වැඩක්, ගෙදර ආහාර සහ උත්තර දෙන කෙනෙක් ඕන බව ඔහු දැක්කා. අපි ඒක ඔහු සමඟ ගොඩනඟනවා.", a_p3: "අපි වැඩ කරන්නේ බලපත්‍රලාභී සමාගම් සහ ලියාපදිංචි වෘත්තිකයන් සමඟ පමණයි. කම්කරුවන්ගේ හෝ හවුල්කරුවන්ගේ නම් අපි ප්‍රකාශ කරන්නේ නැහැ.",
       a_priv_t: "පෞද්ගලිකත්වය", a_priv: "ඔබ WhatsApp හරහා එවන දේ පමණයි අපි තබාගන්නේ: නම, දුරකථන, රැකියාව, බලපත්‍ර වර්ගය, සමාගම, ආපු මාසය, ප්‍රදේශය, කැමැත්ත. රැකියා සහ සේවා ගැන ඔබව සම්බන්ධ කර ගන්න ඒක භාවිත වෙනවා. 'delete' කියලා ලියන්න, අපි මකනවා.",
+      nav_survey: "සමීක්ෂණය", sv_title: "මිනිත්තු 2යි: අපි මොනවද ගේන්න ඕනේ?", sv_lead: "ශ්‍රී ලාංකික ආහාර සහ දෛනික බඩු සඳහා සතිපතා pickup ස්ථාන අපි විවෘත කරනවා. ඔයාට මොනවද ඕනේ, ඔයා ඉන්නේ කොහෙද කියන්න. නම අවශ්‍ය නැහැ – අපි කතා කරනවට කැමති නම් විතරයි.",
+      sv_city: "ඔයා ජීවත් වෙන්නේ කොහෙද? (නගරය / ප්‍රදේශය)", sv_day: "ඔයාගේ නිවාඩු දවස", sv_buy: "දැන් ශ්‍රී ලාංකික ආහාර ගන්නේ කොහෙන්ද? (කඩේ, නගරය, WhatsApp group)", sv_spend: "මාසෙකට ආහාර වලට කීයක් වියදම් කරනවද (එක්කෙනෙකුට)?",
+      sv_products: "හැම සතියෙම ගන්න ඒවා ලකුණු කරන්න", sv_missing: "ඊශ්‍රායලයේ නැති හෝ ගණන් වැඩි දේවල් මොනවද? (නිදහසේ ලියන්න)", sv_pay: "ගෙවන්න කැමති විදිහ", sv_host: "මම ජීවත් වෙන තැන pickup ස්ථානයක සම්බන්ධ පුද්ගලයා වෙන්න මට පුළුවන් (සතියකට එක දවසක් බඩු තියාගන්න ඉඩ).",
+      sv_name: "නම (අත්‍යවශ්‍ය නැහැ)", sv_phone: "දුරකථනය (අපි කතා කරනවට කැමති නම් විතරයි)", sv_note: "වෙනත් දෙයක්", sv_consent: "දුරකථන අංකය දුන්නා නම්: කඩේ ගැන මට සම්බන්ධ වෙන්න එකඟයි. විස්තර ඒකට විතරයි, ඉල්ලුවොත් මකනවා.",
+      sv_btn: "යවන්න", sv_sending: "යවමින්…", sv_ok_t: "ස්තූතියි! 🙏", sv_ok: "ඔයාගේ උත්තර අපිට ලැබුණා. ප්‍රමාණවත් අය ඉන්න කොට ඔයාගේ ප්‍රදේශයේ pickup ස්ථානයක් විවෘත කරනවා. දුරකථන අංකය දුන්නා නම් ඔයාගේ භාෂාවෙන් ලියනවා.",
+      sv_err: "යවන්න බැරි වුණා. සම්බන්ධතාවය බලලා ආයෙ උත්සාහ කරන්න, නැත්නම් WhatsApp එකෙන් යවන්න.", sv_err_consent: "දුරකථන අංකයක් ලිව්වා – කරුණාකර එකඟතා කොටුව ලකුණු කරන්න, නැත්නම් අංකය මකන්න.", sv_wa: "ඒ වෙනුවට WhatsApp එකෙන් යවන්න",
+      d_sat: "සෙනසුරාදා", d_sun: "ඉරිදා", d_fri: "සිකුරාදා", d_other: "වෙනත් දවසක් / වෙනස් වෙනවා", d_none: "ස්ථිර දවසක් නැහැ",
+      sp_lt300: "₪300ට අඩු", sp_300_600: "₪300–600", sp_600_1000: "₪600–1,000", sp_gt1000: "₪1,000ට වැඩි",
+      pay_cash: "ගන්න කොට මුදලින්", pay_card: "කාඩ්", pay_link: "කලින් ගෙවීමේ link එකක්", pay_any: "ඕනෑම එකක්",
+      pr_rice_samba: "සම්බා හාල්", pr_rice_nadu: "නාඩු / රතු හාල්", pr_rice_basmati: "බාස්මතී හාල්", pr_dhal_red: "රතු පරිප්පු", pr_flour_atta: "ආටා පිටි", pr_flour_white: "සුදු පිටි", pr_sugar: "සීනි",
+      pr_coconut_milk: "පොල් කිරි", pr_oil_coconut: "පොල් තෙල්", pr_oil_cooking: "ඉවුම් තෙල්", pr_curry_powder: "තුනපහ (බැදපු)", pr_chili: "මිරිස් කුඩු / පියලි", pr_turmeric: "කහ", pr_spices_whole: "මුළු කුළුබඩු (එනසාල්, කුරුඳු, කරාබුනැටි)",
+      pr_maldive_fish: "උම්බලකඩ", pr_tea_ceylon: "ලංකා තේ", pr_noodles: "ක්ෂණික නූඩ්ල්ස්", pr_sardines: "ටින් සාඩින් / මැකරල්", pr_tuna: "ටින් ටූනා", pr_milk_powder: "කිරි පිටි", pr_biscuits: "බිස්කට් / කෑම", pr_jaggery: "හකුරු", pr_papadam: "පපඩම්",
+      pr_toilet_paper: "ටොයිලට් පේපර්", pr_paper_towel: "කඩදාසි තුවා", pr_dish_soap: "පිඟන් සෝදන දියර", pr_laundry: "රෙදි සෝදන කුඩු", pr_trash_bags: "කුණු බෑග්", pr_disposables: "පිඟන්, කෝප්ප, හැඳි", pr_food_boxes: "කෑම පෙට්ටි", pr_soap: "සබන් / ෂැම්පු",
       r_title: "ලියාපදිංචි වන්න", r_lead: "ෆෝම් එක පුරවන්න. කොළ බොත්තම ඔබේ message එක සූදානම්ව WhatsApp විවෘත කරනවා. යවන්න — දවස් කිහිපයක් ඇතුළත අපි ඔබේ භාෂාවෙන් ආපසු කතා කරනවා.",
       r_name: "සම්පූර්ණ නම", r_phone: "දුරකථන (ඊශ්‍රායල)", r_trade: "රැකියාව", r_permit: "බලපත්‍ර වර්ගය", r_corp: "දැන් ඉන්න සමාගම (නම)", r_arrived: "ඊශ්‍රායලයට ආවේ", r_region: "වැඩ කරන්න කැමති තැන", r_interests: "මම කැමතියි", r_note: "වෙනත් දෙයක්",
       r_consent: "රැකියා සහ සේවා ගැන මාව සම්බන්ධ කර ගන්න මම එකඟයි. මගේ විස්තර ඒ සඳහා පමණයි තබාගන්නේ, ඉල්ලූ විට මකනවා.", r_btn: "WhatsApp හරහා යවන්න", r_err_name: "කරුණාකර ඔබේ සම්පූර්ණ නම ලියන්න.", r_err_consent: "කරුණාකර එකඟතා කොටුව ලකුණු කරන්න.",
@@ -100,6 +130,19 @@
       v_1t: "பயணம்", v_1p: "ஒப்புக்கொண்ட விலையில் உரிமம் பெற்ற டாக்ஸி மற்றும் போக்குவரத்து ஓட்டுநர்களுடன். பணத்திற்காக தனியார் கார்கள் ஒருபோதும் இல்லை — இஸ்ரேலில் அது சட்டவிரோதம், உங்களுக்குப் பாதுகாப்பற்றது.", v_2t: "படிவங்கள் மற்றும் கேள்விகள்", v_2p: "கடிதம், சம்பளச் சீட்டு, படிவத்தைப் புரிந்துகொள்ள உதவி. நாங்கள் விளக்குகிறோம்; தேவைப்பட்டால் வழக்கறிஞர் முடிவு செய்கிறார்.", v_3t: "பணம் மற்றும் அஞ்சல்", v_3p: "திட்டமிடப்பட்டது, இன்னும் திறக்கவில்லை. இஸ்ரேலில் இவற்றுக்கு உரிமங்கள் தேவை; உரிமம் உள்ளதை மட்டுமே செய்கிறோம்.", v_4t: "பதிலளிக்கும் நபர்", v_4p: "தமிழில் அல்லது சிங்களத்தில் WhatsApp. ஒரு நாளுக்குள் பதில்.",
       a_title: "எங்களைப் பற்றி", a_p1: "நாங்கள் மத்திய இஸ்ரேலில் உள்ள இஸ்ரேலிய குடும்ப நிறுவனம்: வணிகங்களுக்கு சுத்தம், காகிதம், உணவுப் பொருட்களின் மொத்த விநியோகஸ்தர், மற்றும் ஒப்பந்ததாரராகப் பதிவு செய்யும் கட்டுமான நிறுவனம்.", a_p2: "இந்தச் சேவையின் யோசனை எங்கள் தளத்தில் உள்ள ஒரு இலங்கைத் தொழிலாளரிடமிருந்து வந்தது; அவரது நண்பர்களுக்கு நம்பக்கூடிய வேலை, வீட்டு உணவு, பதிலளிக்கும் ஒருவர் தேவை என்று அவர் கண்டார். அவருடன் சேர்ந்து உருவாக்குகிறோம்.", a_p3: "உரிமம் பெற்ற நிறுவனங்கள் மற்றும் பதிவு செய்யப்பட்ட நிபுணர்களுடன் மட்டுமே பணிபுரிகிறோம். தொழிலாளர்கள் அல்லது கூட்டாளிகளின் பெயர்களை வெளியிடுவதில்லை.",
       a_priv_t: "தனியுரிமை", a_priv: "WhatsApp-இல் நீங்கள் அனுப்புவதை மட்டுமே வைத்திருக்கிறோம்: பெயர், தொலைபேசி, தொழில், அனுமதி வகை, நிறுவனம், வந்த மாதம், பகுதி, ஆர்வங்கள். வேலை மற்றும் சேவைகள் குறித்து உங்களைத் தொடர்பு கொள்ள மட்டுமே. 'delete' என்று எழுதுங்கள், நீக்குகிறோம்.",
+      nav_survey: "கணக்கெடுப்பு", sv_title: "2 நிமிடம்: நாங்கள் என்ன கொண்டு வர வேண்டும்?", sv_lead: "இலங்கை உணவு மற்றும் அன்றாடப் பொருட்களுக்கு வாராந்திர pickup இடங்களைத் திறக்கிறோம். உங்களுக்கு என்ன தேவை, நீங்கள் எங்கே இருக்கிறீர்கள் என்று சொல்லுங்கள். நாங்கள் அழைக்க வேண்டுமென்றால் மட்டுமே பெயர் தேவை.",
+      sv_city: "நீங்கள் எங்கே வசிக்கிறீர்கள்? (நகரம் / பகுதி)", sv_day: "உங்கள் விடுமுறை நாள்", sv_buy: "இப்போது இலங்கை உணவை எங்கே வாங்குகிறீர்கள்? (கடை, நகரம், WhatsApp குழு)", sv_spend: "மாதத்திற்கு உணவுக்கு எவ்வளவு செலவு (ஒருவருக்கு)?",
+      sv_products: "ஒவ்வொரு வாரமும் வாங்குவதைத் தேர்ந்தெடுங்கள்", sv_missing: "இஸ்ரேலில் கிடைக்காதது அல்லது விலை அதிகமானது எது? (சுதந்திரமாக எழுதுங்கள்)", sv_pay: "எப்படிப் பணம் செலுத்த விரும்புகிறீர்கள்?", sv_host: "நான் வசிக்கும் இடத்தில் pickup இடத்திற்கான தொடர்பு நபராக இருக்க முடியும் (வாரத்திற்கு ஒரு நாள் சேமிப்பு இடம்).",
+      sv_name: "பெயர் (விருப்பத்திற்கு)", sv_phone: "தொலைபேசி (நாங்கள் அழைக்க வேண்டுமென்றால் மட்டும்)", sv_note: "வேறு ஏதாவது", sv_consent: "தொலைபேசி எண் கொடுத்திருந்தால்: கடை பற்றி என்னைத் தொடர்பு கொள்ள சம்மதிக்கிறேன். விவரங்கள் அதற்காக மட்டுமே, கேட்டால் நீக்கப்படும்.",
+      sv_btn: "அனுப்பு", sv_sending: "அனுப்புகிறது…", sv_ok_t: "நன்றி! 🙏", sv_ok: "உங்கள் பதில்கள் எங்களை அடைந்தன. போதுமான மக்கள் இருக்கும்போது உங்கள் பகுதியில் pickup இடத்தைத் திறப்போம். தொலைபேசி கொடுத்திருந்தால் உங்கள் மொழியில் எழுதுவோம்.",
+      sv_err: "அனுப்ப முடியவில்லை. இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும், அல்லது WhatsApp-இல் அனுப்பவும்.", sv_err_consent: "தொலைபேசி எண் எழுதியுள்ளீர்கள் – சம்மதப் பெட்டியைத் தேர்ந்தெடுக்கவும், அல்லது எண்ணை நீக்கவும்.", sv_wa: "அதற்குப் பதிலாக WhatsApp-இல் அனுப்பு",
+      d_sat: "சனிக்கிழமை", d_sun: "ஞாயிறு", d_fri: "வெள்ளி", d_other: "வேறு நாள் / மாறும்", d_none: "நிலையான நாள் இல்லை",
+      sp_lt300: "₪300க்கும் குறைவு", sp_300_600: "₪300–600", sp_600_1000: "₪600–1,000", sp_gt1000: "₪1,000க்கும் மேல்",
+      pay_cash: "எடுக்கும்போது ரொக்கம்", pay_card: "அட்டை", pay_link: "முன்கூட்டியே payment link", pay_any: "எதுவும்",
+      pr_rice_samba: "சம்பா அரிசி", pr_rice_nadu: "நாடு / சிவப்பு அரிசி", pr_rice_basmati: "பாஸ்மதி அரிசி", pr_dhal_red: "சிவப்பு பருப்பு", pr_flour_atta: "ஆட்டா மாவு", pr_flour_white: "வெள்ளை மாவு", pr_sugar: "சர்க்கரை",
+      pr_coconut_milk: "தேங்காய்ப் பால்", pr_oil_coconut: "தேங்காய் எண்ணெய்", pr_oil_cooking: "சமையல் எண்ணெய்", pr_curry_powder: "கறித்தூள் (வறுத்தது)", pr_chili: "மிளகாய்த் தூள் / செதில்", pr_turmeric: "மஞ்சள்", pr_spices_whole: "முழு மசாலா (ஏலக்காய், கறுவா, கிராம்பு)",
+      pr_maldive_fish: "மாசிக்கருவாடு (Maldive fish)", pr_tea_ceylon: "இலங்கைத் தேயிலை", pr_noodles: "உடனடி நூடுல்ஸ்", pr_sardines: "டின் சார்டின் / மக்கரல்", pr_tuna: "டின் டூனா", pr_milk_powder: "பால் பவுடர்", pr_biscuits: "பிஸ்கட் / சிற்றுண்டி", pr_jaggery: "வெல்லம்", pr_papadam: "பப்படம்",
+      pr_toilet_paper: "டாய்லெட் பேப்பர்", pr_paper_towel: "பேப்பர் டவல்", pr_dish_soap: "பாத்திரம் கழுவும் திரவம்", pr_laundry: "சலவைத் தூள்", pr_trash_bags: "குப்பைப் பைகள்", pr_disposables: "தட்டுகள், கோப்பைகள், கரண்டிகள்", pr_food_boxes: "உணவுப் பெட்டிகள்", pr_soap: "சோப்பு / ஷாம்பு",
       r_title: "பதிவு செய்", r_lead: "படிவத்தை நிரப்புங்கள். பச்சை பொத்தான் உங்கள் செய்தி தயாராக WhatsApp-ஐத் திறக்கும். அனுப்புங்கள்; சில நாட்களுக்குள் உங்கள் மொழியில் திரும்ப அழைப்போம்.",
       r_name: "முழுப் பெயர்", r_phone: "தொலைபேசி (இஸ்ரேல்)", r_trade: "தொழில்", r_permit: "அனுமதி வகை", r_corp: "தற்போதைய நிறுவனம் (பெயர்)", r_arrived: "இஸ்ரேலுக்கு வந்தது", r_region: "வேலை செய்ய விரும்பும் இடம்", r_interests: "எனக்கு ஆர்வம்", r_note: "வேறு ஏதேனும்",
       r_consent: "வேலை மற்றும் சேவைகள் குறித்து என்னைத் தொடர்பு கொள்ள ஒப்புக்கொள்கிறேன். என் விவரங்கள் அதற்காக மட்டுமே; கேட்டால் நீக்கப்படும்.", r_btn: "WhatsApp-இல் அனுப்பு", r_err_name: "உங்கள் முழுப் பெயரை எழுதுங்கள்.", r_err_consent: "ஒப்புதல் பெட்டியைத் தேர்வு செய்யுங்கள்.",
@@ -135,6 +178,19 @@
       v_1t: "הסעות", v_1p: "נסיעות עם נהגי מונית ומסיעים מורשים במחיר מוסכם. לעולם לא רכב פרטי בתשלום; זה לא חוקי בישראל ולא בטוח לך.", v_2t: "טפסים ושאלות", v_2p: "עזרה להבין מכתב, תלוש, טופס. אנחנו מסבירים; עורך דין מחליט כשצריך.", v_3t: "כסף ודואר", v_3p: "מתוכנן, עדיין לא פתוח. אלה דורשים רישיונות בישראל ואנחנו עושים רק מה שמורשה.", v_4t: "מישהו שעונה", v_4p: "וואטסאפ בסינהלית או בטמילית. עונים תוך יום.",
       a_title: "עלינו", a_p1: "אנחנו עסק משפחתי ישראלי ממרכז הארץ: מפיץ סיטונאי של מוצרי ניקיון, נייר ומזון לעסקים, ועסק בנייה שנרשם כקבלן.", a_p2: "הרעיון לשירות הזה הגיע מפועל סרילנקי באחד האתרים שלנו, שראה שהחברים שלו צריכים עבודה שאפשר לסמוך עליה, אוכל מהבית, ומישהו שעונה. אנחנו בונים את זה איתו.", a_p3: "אנחנו עובדים רק עם תאגידים מורשים ואנשי מקצוע רשומים. אנחנו לא מפרסמים שמות של פועלים או שותפים.",
       a_priv_t: "פרטיות", a_priv: "אנחנו שומרים רק מה ששלחת בוואטסאפ: שם, טלפון, מקצוע, סוג היתר, תאגיד, חודש הגעה, אזור, תחומי עניין. זה משמש ליצירת קשר בעניין עבודה ושירותים. תכתוב 'delete' ונמחק.",
+      nav_survey: "סקר", sv_title: "2 דקות: מה להביא לכם?", sv_lead: "אנחנו פותחים נקודות איסוף שבועיות למזון סרילנקי ומוצרים יומיומיים. ספרו לנו מה אתם צריכים ואיפה אתם. לא צריך שם, אלא אם אתם רוצים שנתקשר.",
+      sv_city: "איפה אתם גרים? (עיר / אזור)", sv_day: "היום החופשי שלכם", sv_buy: "איפה אתם קונים היום מזון סרילנקי? (חנות, עיר, קבוצת וואטסאפ)", sv_spend: "כמה אתם מוציאים על אוכל בחודש (לאדם)?",
+      sv_products: "סמנו מה הייתם קונים כל שבוע", sv_missing: "מה חסר או יקר מדי בישראל? (כתבו חופשי)", sv_pay: "איך נוח לכם לשלם?", sv_host: "אני יכול להיות איש הקשר לנקודת איסוף במקום מגוריי (מקום אחסון ליום אחד בשבוע).",
+      sv_name: "שם (לא חובה)", sv_phone: "טלפון (לא חובה, אם תרצו שנתקשר)", sv_note: "עוד משהו", sv_consent: "אם נתתי טלפון: אני מסכים שתיצרו איתי קשר בעניין החנות. הפרטים נשמרים לכך בלבד ונמחקים לפי בקשה.",
+      sv_btn: "שליחה", sv_sending: "שולח…", sv_ok_t: "תודה! 🙏", sv_ok: "התשובות הגיעו אלינו. נפתח נקודת איסוף באזור שלכם כשיהיו מספיק אנשים. אם השארתם טלפון, נכתוב לכם בשפה שלכם.",
+      sv_err: "לא הצלחנו לשלוח. בדקו חיבור ונסו שוב, או שלחו בוואטסאפ.", sv_err_consent: "כתבתם טלפון — סמנו את תיבת ההסכמה, או מחקו את הטלפון.", sv_wa: "לשלוח בוואטסאפ במקום",
+      d_sat: "שבת", d_sun: "ראשון", d_fri: "שישי", d_other: "יום אחר / משתנה", d_none: "אין יום קבוע",
+      sp_lt300: "פחות מ-300 ₪", sp_300_600: "300–600 ₪", sp_600_1000: "600–1,000 ₪", sp_gt1000: "יותר מ-1,000 ₪",
+      pay_cash: "מזומן באיסוף", pay_card: "כרטיס", pay_link: "לינק תשלום מראש", pay_any: "לא משנה",
+      pr_rice_samba: "אורז סמבה", pr_rice_nadu: "אורז נאדו / אדום", pr_rice_basmati: "אורז בסמטי", pr_dhal_red: "עדשים אדומות (דאל)", pr_flour_atta: "קמח אטה", pr_flour_white: "קמח לבן", pr_sugar: "סוכר",
+      pr_coconut_milk: "חלב קוקוס", pr_oil_coconut: "שמן קוקוס", pr_oil_cooking: "שמן בישול", pr_curry_powder: "אבקת קארי (קלויה)", pr_chili: "צ'ילי טחון / פתיתים", pr_turmeric: "כורכום", pr_spices_whole: "תבלינים שלמים (הל, קינמון, ציפורן)",
+      pr_maldive_fish: "Maldive fish (דג מיובש)", pr_tea_ceylon: "תה ציילון", pr_noodles: "נודלס מהיר", pr_sardines: "סרדינים / מקרל בקופסה", pr_tuna: "טונה בקופסה", pr_milk_powder: "אבקת חלב", pr_biscuits: "ביסקוויטים / חטיפים", pr_jaggery: "ג'אגרי", pr_papadam: "פפדם",
+      pr_toilet_paper: "נייר טואלט", pr_paper_towel: "מגבות נייר", pr_dish_soap: "סבון כלים", pr_laundry: "אבקת כביסה", pr_trash_bags: "שקיות אשפה", pr_disposables: "צלחות, כוסות, סכו\"ם", pr_food_boxes: "קופסאות אוכל", pr_soap: "סבון / שמפו",
       r_title: "הרשמה", r_lead: "ממלאים את הטופס. הכפתור הירוק פותח וואטסאפ עם ההודעה מוכנה. שולחים, ואנחנו חוזרים תוך כמה ימים בשפה שלך.",
       r_name: "שם מלא", r_phone: "טלפון (ישראל)", r_trade: "מקצוע", r_permit: "סוג היתר", r_corp: "התאגיד הנוכחי (שם החברה)", r_arrived: "הגעתי לישראל", r_region: "איפה אני רוצה לעבוד", r_interests: "מתעניין ב", r_note: "עוד משהו",
       r_consent: "אני מסכים שתיצרו איתי קשר בעניין עבודה ושירותים. הפרטים נשמרים רק לזה ונמחקים לפי בקשה.", r_btn: "שליחה בוואטסאפ", r_err_name: "נא לכתוב שם מלא.", r_err_consent: "נא לסמן את תיבת ההסכמה.",
@@ -170,6 +226,8 @@
   function fill(sel, keys, prefix) { if (!sel) return; var cur = sel.value; sel.textContent = ""; var o0 = document.createElement("option"); o0.value = ""; o0.textContent = t("o_none"); sel.appendChild(o0); keys.forEach(function (k) { var o = document.createElement("option"); o.value = k; o.textContent = t(prefix + k); sel.appendChild(o); }); sel.value = cur; }
   function fillChecks(c) { if (!c) return; var checked = {}; c.querySelectorAll("input").forEach(function (i) { checked[i.value] = i.checked; }); c.textContent = ""; INTERESTS.forEach(function (k) { var l = document.createElement("label"); var i = document.createElement("input"); i.type = "checkbox"; i.value = k; i.id = "int-" + k; i.checked = !!checked[k]; l.appendChild(i); var s = document.createElement("span"); s.textContent = t("i_" + k); l.appendChild(s); c.appendChild(l); }); }
 
+  function fillProducts(c) { if (!c) return; var checked = {}; c.querySelectorAll("input").forEach(function (i) { checked[i.value] = i.checked; }); c.textContent = ""; PRODUCTS.forEach(function (k) { var l = document.createElement("label"); var i = document.createElement("input"); i.type = "checkbox"; i.value = k; i.id = "pr-" + k; i.checked = !!checked[k]; l.appendChild(i); var s = document.createElement("span"); s.textContent = t("pr_" + k); l.appendChild(s); c.appendChild(l); }); }
+
   function apply() {
     document.documentElement.setAttribute("dir", lang === "he" ? "rtl" : "ltr"); document.documentElement.setAttribute("lang", lang);
     document.querySelectorAll("[data-i18n]").forEach(function (e) { e.textContent = t(e.getAttribute("data-i18n")); });
@@ -179,6 +237,7 @@
     document.querySelectorAll("a[data-wa]").forEach(function (a) { a.href = "https://wa.me/" + to; });
     document.querySelectorAll("[data-num]").forEach(function (e) { e.textContent = "WhatsApp: +" + to; });
     fill($("r-trade"), TRADES, "t_"); fill($("r-permit"), PERMITS, "p_"); fill($("r-region"), REGIONS, "g_"); fillChecks($("r-interests"));
+    fill($("sv-day"), DAYS, "d_"); fill($("sv-spend"), SPENDS, "sp_"); fill($("sv-pay"), PAYS, "pay_"); fillProducts($("sv-products"));
   }
   document.querySelectorAll(".lang button").forEach(function (b) { b.addEventListener("click", function () { lang = b.getAttribute("data-lang"); try { localStorage.setItem("sm-lang", lang); } catch (e) {} apply(); }); });
 
@@ -198,6 +257,35 @@
       lines.push(t("r_m_consent"));
       var url = "https://wa.me/" + to + "?text=" + encodeURIComponent(lines.join("\n"));
       var a = document.createElement("a"); a.href = url; a.target = "_blank"; a.rel = "noopener"; document.body.appendChild(a); a.click(); a.remove();
+    });
+  }
+  // community survey → CRM (stored), WhatsApp as fallback
+  var sv = $("survey");
+  if (sv) {
+    var busy = false;
+    sv.addEventListener("submit", function (ev) {
+      ev.preventDefault(); if (busy) return;
+      var err = $("sv-err"); err.textContent = "";
+      var phone = $("sv-phone").value.trim();
+      if (phone && !$("sv-consent").checked) { err.textContent = t("sv_err_consent"); return; }
+      var products = []; sv.querySelectorAll("#sv-products input:checked").forEach(function (i) { products.push(i.value); });
+      var payload = { lang: lang, city: $("sv-city").value.trim(), dayOff: $("sv-day").value, buysWhere: $("sv-buy").value.trim(), monthlySpend: $("sv-spend").value,
+        products: products, missing: $("sv-missing").value.trim(), payPref: $("sv-pay").value, pointHost: $("sv-host").checked,
+        name: $("sv-name").value.trim(), phone: phone, note: $("sv-note").value.trim(), consent: $("sv-consent").checked, website: $("sv-website").value, source: "brochure", to: to };
+      var btn = sv.querySelector("button[type=submit]"); busy = true; btn.disabled = true; btn.textContent = t("sv_sending");
+      fetch(SURVEY_API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+        .then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.json(); })
+        .then(function () { sv.hidden = true; var ok = $("sv-ok"); ok.hidden = false; ok.scrollIntoView(); try { localStorage.setItem("sm-survey-done", "1"); } catch (e) {} })
+        .catch(function () {
+          err.textContent = t("sv_err");
+          var lines = [t("sv_title"), t("sv_city") + ": " + (payload.city || "-"), t("sv_day") + ": " + (payload.dayOff ? t("d_" + payload.dayOff) : "-"), t("sv_buy") + ": " + (payload.buysWhere || "-"),
+            t("sv_spend") + ": " + (payload.monthlySpend ? t("sp_" + payload.monthlySpend) : "-"), t("sv_products") + ": " + (products.map(function (k) { return t("pr_" + k); }).join(", ") || "-"),
+            t("sv_missing") + ": " + (payload.missing || "-"), t("sv_pay") + ": " + (payload.payPref ? t("pay_" + payload.payPref) : "-")];
+          if (payload.pointHost) lines.push(t("sv_host"));
+          if (payload.name) lines.push(t("sv_name") + ": " + payload.name); if (phone) lines.push(t("sv_phone") + ": " + phone); if (payload.note) lines.push(t("sv_note") + ": " + payload.note);
+          var wa = $("sv-wa"); wa.hidden = false; wa.href = "https://wa.me/" + to + "?text=" + encodeURIComponent(lines.join("\n"));
+        })
+        .then(function () { busy = false; btn.disabled = false; btn.textContent = t("sv_btn"); });
     });
   }
   apply();
